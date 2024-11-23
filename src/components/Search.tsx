@@ -1,25 +1,36 @@
 "use client";
 
-import { buildings, rooms } from "../utils/data";
+import { Building, buildings, rooms } from "../utils/data";
 import { MutableRefObject, useState } from "react";
 
-export default function Search({ ref }: { ref: MutableRefObject<null> }) {
+export default function Search({
+  mref,
+  select,
+}: {
+  mref: MutableRefObject<null>;
+  select: React.Dispatch<React.SetStateAction<Building | null>>;
+}) {
   const [input, setInput] = useState<string>("");
 
-  const filteredBuildings = buildings.filter((building) =>
-    building.name.toLowerCase().includes(input.toLowerCase())
+  const filteredBuildings = buildings.filter(
+    (building) =>
+      building.name.toLowerCase().includes(input.toLowerCase()) ||
+      building.keywords.toLowerCase().includes(input.toLowerCase()) ||
+      building.description.toLowerCase().includes(input.toLowerCase())
   );
+  
   const filteredRooms = rooms.filter(
     (room) =>
       room.name.toLowerCase().includes(input.toLowerCase()) ||
       buildings[room.building - 1].name.includes(input.toLowerCase())
   );
 
-  const focusOnBuilding = (coordinates: [number, number]) => {
-    if (ref.current) {
+  const focusOnBuilding = (building: Building) => {
+    if (mref.current) {
       // @ts-expect-error false
-      ref.current.flyTo(coordinates, 18);
+      mref.current.flyTo(building.coordinates, 18);
     }
+    select(building);
   };
 
   return (
@@ -30,6 +41,7 @@ export default function Search({ ref }: { ref: MutableRefObject<null> }) {
         onChange={(e) => {
           setInput(e.target.value);
         }}
+        placeholder="Search..."
         value={input}
       />
       {input!.length > 0 && (
@@ -45,7 +57,7 @@ export default function Search({ ref }: { ref: MutableRefObject<null> }) {
                     key={building.id}
                     className="text-white py-2 hover:bg-white/30 cursor-pointer"
                     onClick={() => {
-                      focusOnBuilding(building.coordinates);
+                      focusOnBuilding(building);
                       setInput("");
                     }}
                   >

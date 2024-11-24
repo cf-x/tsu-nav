@@ -9,6 +9,7 @@ import {
 import { Building, rooms } from "../utils/data";
 import { MutableRefObject, useState } from "react";
 import { FaInfoCircle, FaSearch } from "react-icons/fa";
+import L from "leaflet";
 
 export default function Info({
   selected,
@@ -16,12 +17,16 @@ export default function Info({
   mref,
   pin,
   pinned,
+  setRouteControl,
 }: {
   selected: Building | null;
   select: React.Dispatch<React.SetStateAction<Building | null>>;
   mref: MutableRefObject<null>;
   pin: React.Dispatch<React.SetStateAction<[number, number] | undefined>>;
   pinned: [number, number] | undefined;
+  setRouteControl: React.Dispatch<
+    React.SetStateAction<L.Routing.Control | null>
+  >;
 }) {
   const [open, setOpen] = useState<boolean>(true);
   const [panel, setPanel] = useState<"info" | "gallery" | "search" | "route">(
@@ -99,6 +104,7 @@ export default function Info({
                   building={selected}
                   pin={pin}
                   pinned={pinned}
+                  setRouteControl={setRouteControl}
                 />
               )}
             </div>
@@ -172,11 +178,15 @@ const RoutePanel = ({
   mref,
   pin,
   pinned,
+  setRouteControl,
 }: {
   building: Building;
   mref: MutableRefObject<null>;
   pin: React.Dispatch<React.SetStateAction<[number, number] | undefined>>;
   pinned: [number, number] | undefined;
+  setRouteControl: React.Dispatch<
+    React.SetStateAction<L.Routing.Control | null>
+  >;
 }) => {
   return (
     <div className="p-2">
@@ -184,14 +194,15 @@ const RoutePanel = ({
         Find the route from:
         {pinned && (
           <div className="flex justify-between">
-            <div className="cursor-pointer underline" onClick={() => {
-              
-            }}>
+            <div className="cursor-pointer underline" onClick={() => {}}>
               Calculate the Route
             </div>
             <div
               className="cursor-pointer underline"
-              onClick={() => pin(undefined)}
+              onClick={() => {
+                pin(undefined);
+                setRouteControl(null);
+              }}
             >
               Reset the Location
             </div>
@@ -205,7 +216,7 @@ const RoutePanel = ({
             mref.current!.flyTo(building.coordinates);
           }}
         >
-          Choose on the Map
+          {pinned ? "Reset" : "Choose on the Map"}
         </div>
         <div className="p-1 border cursor-pointer rounded-md select-none">
           Choose the building

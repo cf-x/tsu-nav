@@ -1,4 +1,3 @@
-"use client";
 import "leaflet/dist/leaflet.css";
 import { MutableRefObject, useEffect, useRef } from "react";
 import { MapContainer, Marker, Popup, TileLayer, Tooltip } from "react-leaflet";
@@ -8,10 +7,13 @@ import L, { Marker as LMarker } from "leaflet";
 export default function Map({
   mref,
   select,
+  pinned,
 }: {
   mref: MutableRefObject<null>;
   selected: Building | null;
   select: React.Dispatch<React.SetStateAction<Building | null>>;
+  pinned: [number, number] | undefined;
+  pin: React.Dispatch<React.SetStateAction<[number, number] | undefined>>;
 }) {
   const markerRefs = useRef<(LMarker | null)[]>([]);
   const pos: [number, number] = [41.7143017651, 44.7494451407];
@@ -49,6 +51,21 @@ export default function Map({
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
       />
+      {pinned && (
+        <Marker
+          position={pinned}
+          icon={L.icon({
+            iconUrl: "/pin.svg",
+            iconSize: [36, 36],
+            iconAnchor: [12, 41],
+            popupAnchor: [1, -36],
+            shadowSize: [41, 41],
+          })}
+          alt="location"
+          key="location"
+          draggable
+        />
+      )}
       {buildings.map((building, index) => (
         <Marker
           position={building.coordinates}

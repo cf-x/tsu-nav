@@ -7,11 +7,24 @@ import Info from "./components/Info.tsx";
 function App() {
   const mapRef = useRef(null);
   const [selected, select] = useState<Building | null>(null);
+  const [pinned, pin] = useState<[number, number]>();
   return (
     <main>
       <Search mref={mapRef} select={select} />
-      <Map mref={mapRef} select={select} selected={selected} />
-      <Info select={select} selected={selected} />
+      <Map
+        mref={mapRef}
+        select={select}
+        selected={selected}
+        pin={pin}
+        pinned={pinned}
+      />
+      <Info
+        mref={mapRef}
+        select={select}
+        selected={selected}
+        pin={pin}
+        pinned={pinned}
+      />
     </main>
   );
 }

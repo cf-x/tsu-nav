@@ -31,7 +31,7 @@ const b1f0_nodes: Node[] = [
     id: 2,
     coo: [50, 230],
     closest: [1],
-    children: [24], // todo stairs, wc
+    children: [24, 999], // todo stairs, wc
   },
   {
     id: 3,

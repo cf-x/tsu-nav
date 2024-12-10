@@ -71,15 +71,7 @@ export const rooms: Room[] = [
     description: "ნატოსა და ევროკავშირის აუდიტორია",
     floor: 0,
     building: 1,
-    coordinates: [0, 0],
-  },
-  {
-    id: 13,
-    name: "ოთახი 013",
-    description: "დაცვისა და უსაფრთხოების სამსახური",
-    floor: 0,
-    building: 1,
-    coordinates: [0, 0],
+    coordinates: [675, 625],
   },
   {
     id: 15,
@@ -87,7 +79,7 @@ export const rooms: Room[] = [
     description: "საგაგმო-საფინანსო განყოფილება",
     floor: 0,
     building: 1,
-    coordinates: [0, 0],
+    coordinates: [320, 625],
   },
   {
     id: 16,
@@ -95,7 +87,7 @@ export const rooms: Room[] = [
     description: "შესყიდვების განყოფილება",
     floor: 0,
     building: 1,
-    coordinates: [0, 0],
+    coordinates: [250, 625],
   },
   {
     id: 17,
@@ -103,7 +95,7 @@ export const rooms: Room[] = [
     description: "იურიდიული დეპარტმაენტი",
     floor: 0,
     building: 1,
-    coordinates: [0, 0],
+    coordinates: [170, 625],
   },
   {
     id: 18,
@@ -111,7 +103,7 @@ export const rooms: Room[] = [
     description: "საფინანსო დეპარტამენტი",
     floor: 0,
     building: 1,
-    coordinates: [0, 0],
+    coordinates: [50, 625],
   },
   {
     id: 19,
@@ -119,7 +111,7 @@ export const rooms: Room[] = [
     description: "საფინანსო დეპარმანტეის უფროსის მოადგილე",
     floor: 0,
     building: 1,
-    coordinates: [0, 0],
+    coordinates: [50, 575],
   },
   {
     id: 20,
@@ -127,7 +119,7 @@ export const rooms: Room[] = [
     description: "სტუდენთა ფინანსური მომსახურება",
     floor: 0,
     building: 1,
-    coordinates: [0, 0],
+    coordinates: [50, 555],
   },
   {
     id: 21,
@@ -135,7 +127,7 @@ export const rooms: Room[] = [
     description: "აუდიტორია",
     floor: 0,
     building: 1,
-    coordinates: [70, 445],
+    coordinates: [50, 445],
   },
   {
     id: 22,
@@ -143,7 +135,7 @@ export const rooms: Room[] = [
     description: "აუდიტორია",
     floor: 0,
     building: 1,
-    coordinates: [70, 385],
+    coordinates: [50, 385],
   },
   {
     id: 24,
@@ -151,7 +143,7 @@ export const rooms: Room[] = [
     description: "აუდიტორია",
     floor: 0,
     building: 1,
-    coordinates: [0, 0],
+    coordinates: [93, 230],
   },
   {
     id: 999,

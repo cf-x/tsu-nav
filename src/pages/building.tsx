@@ -72,38 +72,40 @@ const Building = () => {
   );
 
   return (
-    <main>
-      <div>
-        {data.name}, floors: {floorsRange}
-      </div>
-      <div className="flex">
-        <select
-          name="floor"
-          id={`select-floor-${id}`}
-          value={floor}
-          className="bg-black cursor-pointer p-2 border"
-          onChange={(e) => setFloor(Number(e.target.value))}
-        >
-          {floorOptions.map((floorNumber) => (
-            <option key={floorNumber} value={floorNumber}>
-              Floor {floorNumber}
-            </option>
-          ))}
-        </select>
-        <select
-          name="room"
-          id={`select-room-${id}`}
-          value={room || 0}
-          className="bg-black cursor-pointer p-2 border"
-          onChange={handleRoomChange}
-        >
-          {floorRooms.map((r) => (
-            <option key={r.id + r.name} value={r.id}>
-              {r.name} - {r.description}
-            </option>
-          ))}
-        </select>
-      </div>
+    <>
+      <nav className="flex p-3 md:py-4 justify-between">
+        <a href="/" className="z-50">უკან დაბრუნება</a>
+        <div className="flex justify-center w-full fixed z-40 gap-x-4 md:gap-x-12">
+          <select
+            name="floor"
+            id={`select-floor-${id}`}
+            value={floor}
+            className="bg-black cursor-pointer p-2 rounded-lg"
+            onChange={(e) => setFloor(Number(e.target.value))}
+          >
+            {floorOptions.map((floorNumber) => (
+              <option key={floorNumber} value={floorNumber}>
+                სართული {floorNumber}
+              </option>
+            ))}
+          </select>
+          <select
+            name="room"
+            id={`select-room-${id}`}
+            value={room || 0}
+            className="bg-black cursor-pointer p-2 rounded-lg"
+            onChange={handleRoomChange}
+          >
+            {floorRooms.map((r) => (
+              <option key={r.id + r.name} value={r.id}>
+                {r.name}
+              </option>
+            ))}
+          </select>
+        </div>
+        <div>{data.name}</div>
+      </nav>
+
       <div className="relative">
         <img
           ref={imageRef}
@@ -111,17 +113,17 @@ const Building = () => {
           alt={`building ${id} floor ${floor} plan`}
         />
         {room && (
-          <svg className="absolute top-0 left-0 w-full h-full pointer-events-none">
+          <svg className="absolute top-0 left-0 w-full h-full pointer-events-none animate-pulse">
             <path
               d={drawNodes(room)}
               stroke="red"
-              strokeWidth="2"
+              strokeWidth="4"
               fill="transparent"
-            />
+            ></path>
           </svg>
         )}
       </div>
-    </main>
+    </>
   );
 };
 export default Building;

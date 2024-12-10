@@ -1,7 +1,7 @@
 import "leaflet/dist/leaflet.css";
 import { MutableRefObject, useEffect, useRef } from "react";
 import { MapContainer, Marker, Popup, TileLayer, Tooltip } from "react-leaflet";
-import { Building, buildings } from "../utils/data";
+import { Building, buildings } from "../data/buildings";
 import L, { Marker as LMarker } from "leaflet";
 import "leaflet-routing-machine";
 

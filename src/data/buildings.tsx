@@ -5,56 +5,20 @@ export interface Building {
   info: string;
   keywords: string;
   coordinates: [number, number];
+  floors?: [number, number]; // from to
   images: string[];
 }
 
-export interface Room {
-  id: number;
-  name: string;
-  description: string;
-  floor: number;
-  building: number; // id
-}
-
-export const rooms: Room[] = [
-  {
-    id: 0,
-    name: "room 101",
-    description: "something room, short description",
-    floor: 1,
-    building: 1,
-  },
-  {
-    id: 1,
-    name: "room 102",
-    description: "something room, short description",
-    floor: 1,
-    building: 1,
-  },
-  {
-    id: 3,
-    name: "room 103",
-    description: "something room, short description",
-    floor: 1,
-    building: 1,
-  },
-  {
-    id: 4,
-    name: "room 104",
-    description: "something room, short description",
-    floor: 1,
-    building: 1,
-  },
-];
 
 export const buildings: Building[] = [
   {
     id: 1,
-    name: "Building 1",
+    name: "I კორპუსი",
     description: "This is Building 1 description.",
     coordinates: [41.710021791849755, 44.77798537734414],
     keywords: "pirveli I პირველი",
     info: "long building info",
+    floors: [0, 3],
     images: [],
   },
   {

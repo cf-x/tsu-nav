@@ -1,8 +1,8 @@
-import Search from "./components/Search.tsx";
-import Map from "./components/Map.tsx";
+import Search from "../components/Search.tsx";
+import Map from "../components/Map.tsx";
 import { useRef, useState } from "react";
-import { Building } from "./utils/data.tsx";
-import Info from "./components/Info.tsx";
+import { Building } from "../data/buildings.tsx";
+import Info from "../components/Info.tsx";
 import L from "leaflet";
 
 function App() {

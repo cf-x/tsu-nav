@@ -1,4 +1,5 @@
-import { Building, buildings, rooms } from "../utils/data";
+import { rooms } from "../data/rooms";
+import { Building, buildings } from "../data/buildings";
 import { MutableRefObject, useState } from "react";
 
 export default function Search({

@@ -6,7 +6,8 @@ import {
   FaRoute,
   FaX,
 } from "react-icons/fa6";
-import { Building, rooms } from "../utils/data";
+import { rooms } from "../data/rooms";
+import { Building } from "../data/buildings";
 import { MutableRefObject, useState } from "react";
 import { FaInfoCircle, FaSearch } from "react-icons/fa";
 import L from "leaflet";

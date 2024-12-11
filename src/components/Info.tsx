@@ -9,7 +9,7 @@ import {
 import { rooms } from "../data/rooms";
 import { Building } from "../data/buildings";
 import { MutableRefObject, useState } from "react";
-import { FaInfoCircle, FaSearch } from "react-icons/fa";
+import { FaSearch } from "react-icons/fa";
 import L from "leaflet";
 
 export default function Info({
@@ -30,9 +30,7 @@ export default function Info({
   >;
 }) {
   const [open, setOpen] = useState<boolean>(true);
-  const [panel, setPanel] = useState<"info" | "gallery" | "search" | "route">(
-    "info"
-  );
+  const [panel, setPanel] = useState<"gallery" | "search" | "route">("search");
   if (!selected) return null;
 
   return (
@@ -58,13 +56,8 @@ export default function Info({
           </div>
           {open && (
             <div>
+              <div className="text-center my-1 text-lg">{selected.name}</div>
               <div className="flex justify-between border-y border-white py-2">
-                <div
-                  className="flex justify-center w-full hover:bg-white/20 py-1 cursor-pointer rounded-md"
-                  onClick={() => setPanel("info")}
-                >
-                  <FaInfoCircle size={20} className="cursor-pointer" />
-                </div>
                 <div
                   className="flex justify-center w-full hover:bg-white/20 py-1 cursor-pointer rounded-md"
                   onClick={() => setPanel("search")}
@@ -75,8 +68,10 @@ export default function Info({
                   />
                 </div>
                 <div
-                  className="flex justify-center w-full hover:bg-white/20 py-1 cursor-pointer rounded-md"
-                  onClick={() => setPanel("gallery")}
+                  className="flex justify-center w-full hover:bg-white/20 py-1 cursor-pointer rounded-md bg-red-400/20"
+                  onClick={() => {
+                    // beta:   setPanel("gallery")
+                  }}
                 >
                   <FaImage
                     size={20}
@@ -84,8 +79,10 @@ export default function Info({
                   />
                 </div>
                 <div
-                  className="flex justify-center w-full hover:bg-white/20 py-1 cursor-pointer rounded-md"
-                  onClick={() => setPanel("route")}
+                  className="flex justify-center w-full hover:bg-white/20 py-1 cursor-pointer rounded-md bg-red-400/20"
+                  onClick={() => {
+                    // beta:   setPanel("route")
+                  }}
                 >
                   <FaRoute
                     size={20}
@@ -93,9 +90,7 @@ export default function Info({
                   />
                 </div>
               </div>
-              {panel === "info" ? (
-                <InfoPanel building={selected} />
-              ) : panel === "search" ? (
+              {panel === "search" ? (
                 <SearchPanel building={selected} />
               ) : panel === "gallery" ? (
                 <GalleryPanel building={selected} />
@@ -116,27 +111,18 @@ export default function Info({
   );
 }
 
-const InfoPanel = ({ building }: { building: Building }) => {
-  return (
-    <div>
-      <div className="my-1 mx-2 text-lg font-semibold">{building.name}</div>
-      {!building.info && building.description}
-      {building.info}
-    </div>
-  );
-};
-
 const SearchPanel = ({ building }: { building: Building }) => {
   const [input, setInput] = useState<string>("");
   return (
     <div>
-      <div className="flex justify-center mt-2">
+      <div className="flex justify-between mt-2">
         <input
           type="text"
-          placeholder="search rooms..."
+          placeholder="მოძებნე ოთახები"
           onChange={(e) => setInput(e.target.value)}
           className="bg-black text-white focus:outline-none px-2 py-1 border-b border-white"
         />
+        <a href={`/plan/${building.id}`}>შენობის გეგმა</a>
       </div>
       <div className="h-32 overflow-y-auto">
         {rooms
@@ -144,6 +130,7 @@ const SearchPanel = ({ building }: { building: Building }) => {
             const searchInput = input.trim().toLowerCase();
             return (
               room.building === building.id &&
+              !room.hidden &&
               (searchInput.length === 0 ||
                 room.name.toLowerCase().includes(searchInput) ||
                 room.description.toLowerCase().includes(searchInput))
@@ -151,7 +138,8 @@ const SearchPanel = ({ building }: { building: Building }) => {
           })
           .map((room) => {
             return (
-              <div
+              <a
+                href={`/plan/${building.id}?floor=${room.floor}&room=${room.id}`}
                 key={`room-${room.id}`}
                 className="w-full p-2 border-b hover:bg-white/20 cursor-pointer flex justify-between"
               >
@@ -159,10 +147,9 @@ const SearchPanel = ({ building }: { building: Building }) => {
                   {room.name} - {room.description}
                 </div>
                 <div className="flex">
-                  <span className="hidden md:block">სართული</span> {room.floor}{" "}
-                  <FaBuilding size={20} />
+                  {room.floor} <FaBuilding size={20} />
                 </div>
-              </div>
+              </a>
             );
           })}
       </div>

@@ -1,4 +1,4 @@
-import { Navigate, useParams } from "react-router-dom";
+import { Navigate, useParams, useSearchParams } from "react-router-dom";
 import { buildings } from "../data/buildings";
 import { useEffect, useRef, useState } from "react";
 import { rooms } from "../data/rooms";
@@ -8,14 +8,20 @@ const Building = () => {
   const [floor, setFloor] = useState<number>(0);
   const { id } = useParams<{ id: string }>();
   const [room, setRoom] = useState<number | null>(null);
+  const [params] = useSearchParams();
   const imageRef = useRef<HTMLImageElement | null>(null);
   const data = buildings.find((b) => b.id === Number(id));
 
   useEffect(() => {
     if (data) {
-      setFloor(data.floors![0]);
+      setFloor(Number(params.get("floor")) || data.floors![0]);
     }
-  }, [data]);
+    setTimeout(() => {
+      if (params.get("room")) {
+        setRoom(Number(params.get("room")));
+      }
+    }, 100);
+  }, [data, params]);
 
   if (!data) {
     return <Navigate to="/?code=404" replace />;
@@ -74,14 +80,19 @@ const Building = () => {
   return (
     <>
       <nav className="flex p-3 md:py-4 justify-between">
-        <a href="/" className="z-50">უკან დაბრუნება</a>
+        <a href="/" className="z-50 -my-2">
+          <img src="/tsu.svg" alt="tsu logo" className="w-12" />
+        </a>
         <div className="flex justify-center w-full fixed z-40 gap-x-4 md:gap-x-12">
           <select
             name="floor"
             id={`select-floor-${id}`}
-            value={floor}
+            defaultValue={Number(params.get("floor")) || data.floors![0]}
             className="bg-black cursor-pointer p-2 rounded-lg"
-            onChange={(e) => setFloor(Number(e.target.value))}
+            onChange={(e) => {
+              setFloor(Number(e.target.value));
+              setRoom(null);
+            }}
           >
             {floorOptions.map((floorNumber) => (
               <option key={floorNumber} value={floorNumber}>

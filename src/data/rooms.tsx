@@ -169,6 +169,7 @@ export const rooms: Room[] = [
     floor: 0,
     building: 1,
     coordinates: [0, 0],
+    hidden: true,
   },
 
   // floor 1

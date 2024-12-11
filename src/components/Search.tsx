@@ -1,15 +1,19 @@
 import { rooms } from "../data/rooms";
 import { Building, buildings } from "../data/buildings";
-import { MutableRefObject, useState } from "react";
+import { useRef, useState } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
+import { FaBook, FaBuilding } from "react-icons/fa6";
 
 export default function Search({
-  mref,
-  select,
+  setQuery,
 }: {
-  mref: MutableRefObject<null>;
-  select: React.Dispatch<React.SetStateAction<Building | null>>;
+  setQuery?: React.Dispatch<React.SetStateAction<string | null>>;
 }) {
   const [input, setInput] = useState<string>("");
+  const searchBarRef = useRef(null);
+  const [cardPosition, setCardPosition] = useState({ top: "0px" });
+  const navigate = useNavigate();
+  const location = useLocation();
 
   const filteredBuildings = buildings.filter(
     (building) =>
@@ -26,79 +30,86 @@ export default function Search({
         .name.includes(input.toLowerCase())
   );
 
-  const focusOnBuilding = (building: Building) => {
-    if (mref.current) {
+  const handleRoute = (building: Building) => {
+    const searchParams = new URLSearchParams(location.search);
+    searchParams.set("focus", building.id.toString());
+    navigate({
+      pathname: "/map",
+      search: searchParams.toString(),
+    });
+  };
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setInput(e.target.value);
+    if (setQuery) setQuery(e.target.value);
+
+    if (searchBarRef.current) {
       // @ts-expect-error false
-      mref.current.flyTo(building.coordinates, 18);
+      const rect = searchBarRef.current.getBoundingClientRect();
+      setCardPosition({ top: `${rect.bottom + window.scrollY}px` });
     }
-    select(building);
   };
 
   return (
-    <div className="h-12 py-2 flex justify-center w-full">
+    <>
       <input
+        ref={searchBarRef}
         type="search"
-        className="w-64 md:w-96 rounded-md bg-black text-white focus:outline-none px-2 py-1 border-2 border-white"
-        onChange={(e) => {
-          setInput(e.target.value);
-        }}
-        placeholder="Search..."
+        className="bg-black border-b border-b-blue-400 min-w-64 md:min-w-96 focus:outline-none px-2 h-8"
+        onChange={handleInputChange}
+        placeholder="ძებნა"
         value={input}
       />
 
-      {input!.length > 0 && (
-        <div className="mt-5 p-3 flex flex-col absolute top-10 w-64 md:w-96 border border-white rounded-md z-50 bg-black">
-          <div>searching for &apos;{input}&apos;...</div>
+      {input.length > 0 && (
+        <div
+          className="mt-5 p-3 flex flex-col absolute w-64 md:w-96 border border-blue-400 rounded-md z-50 bg-black"
+          style={{ top: cardPosition.top }}
+        >
+          <div>ძიების შედეგები &apos;{input}&apos;-თვის...</div>
 
           {filteredBuildings.length > 0 && (
-            <div>
-              <h3 className="text-white font-bold mt-2">Buildings:</h3>
-              <ul>
-                {filteredBuildings.map((building) => (
-                  <li
-                    key={building.id}
-                    className="text-white py-2 hover:bg-white/30 cursor-pointer"
-                    onClick={() => {
-                      focusOnBuilding(building);
-                      setInput("");
-                    }}
-                  >
-                    {building.name} - {building.description}
-                  </li>
-                ))}
-              </ul>
-            </div>
+            <ul>
+              {filteredBuildings.map((building) => (
+                <li
+                  key={building.id}
+                  className="text-white py-2 hover:text-blue-400 cursor-pointer p-1 flex gap-x-2 items-center"
+                  onClick={() => handleRoute(building)}
+                >
+                  <FaBuilding /> {building.name}
+                </li>
+              ))}
+            </ul>
           )}
 
           {filteredRooms.length > 0 && (
-            <div className="mt-2">
-              <h3 className="text-white font-bold">Rooms:</h3>
-              <ul>
-                {filteredRooms.map((room) => (
-                  <li
-                    key={room.id}
-                    className="text-white py-2 hover:bg-white/30 cursor-pointer"
-                    onClick={() => {
-                      focusOnBuilding(
-                        buildings.filter((b) => b.id === room.building)[0]
-                      );
-                      setInput("");
-                    }}
-                  >
-                    {room.name} -{" "}
-                    {buildings.filter((b) => b.id === room.building)[0].name}:{" "}
-                    {room.description}
-                  </li>
-                ))}
-              </ul>
-            </div>
+            <ul>
+              {filteredRooms.map((room) => (
+                <a
+                  key={room.id}
+                  className="text-white py-2 hover:text-blue-400 cursor-pointer p-1 flex gap-x-2 items-center"
+                  href={`/plan/${room.building}?floor=${room.floor}&room=${room.id}`}
+                  onClick={() => {
+                    handleRoute(
+                      buildings.filter((b) => b.id === room.building)[0]
+                    );
+                    setInput("");
+                  }}
+                >
+                  <FaBook />
+                  {room.name} -{" "}
+                  {buildings.filter((b) => b.id === room.building)[0].name}:{" "}
+                  {room.description}
+                </a>
+              ))}
+            </ul>
           )}
 
           {filteredBuildings.length === 0 && filteredRooms.length === 0 && (
-            <div className="text-white">No results found.</div>
+            <div className="text-white">ვერაფერი მოიძებნა, ცადეთ <a href="/#fs" className="underline text-blue-400">სწრაფი ძებნა</a></div>
           )}
         </div>
       )}
-    </div>
+    </>
   );
 }

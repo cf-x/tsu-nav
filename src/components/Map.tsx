@@ -4,6 +4,7 @@ import { MapContainer, Marker, Popup, TileLayer, Tooltip } from "react-leaflet";
 import { Building, buildings } from "../data/buildings";
 import L, { Marker as LMarker } from "leaflet";
 import "leaflet-routing-machine";
+import { useSearchParams } from "react-router-dom";
 
 export default function Map({
   mref,
@@ -26,6 +27,7 @@ export default function Map({
 }) {
   const markerRefs = useRef<(LMarker | null)[]>([]);
   const pinRef = useRef(null);
+  const [sp] = useSearchParams();
   const pos: [number, number] = [41.7143017651, 44.7494451407];
   const zoom = 13;
 
@@ -41,6 +43,22 @@ export default function Map({
     });
     L.Marker.prototype.options.icon = defIcon;
   }, []);
+
+  useEffect(() => {
+    setTimeout(() => {
+      if (sp.get("focus")) {
+        const building = buildings.filter(
+          (b) => b.id === Number(sp.get("focus"))
+        )[0];
+
+        if (mref.current) {
+          // @ts-expect-error false
+          mref.current.flyTo(building.coordinates, 18);
+        }
+        select(building);
+      }
+    }, 100);
+  }, [sp, mref, select]);
 
   useEffect(() => {
     if (!pinned) {

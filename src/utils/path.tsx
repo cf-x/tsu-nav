@@ -26,7 +26,6 @@ export function nodes(b: number, fl: number, room: number): [number, number][] {
       continue;
     }
     if (current.children.includes(room)) {
-      console.log(history);
       const i = floor.nodes[currentNode].closest[0];
       if (i) result.push(floor.nodes[i].coo);
       result.push(floor.nodes[currentNode].coo);

@@ -7,6 +7,10 @@
   color: black;
 }
 
+html {
+  scroll-behavior: smooth;
+}
+
 body {
   background: black;
   color: white;

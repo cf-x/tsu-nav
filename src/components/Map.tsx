@@ -29,7 +29,7 @@ export default function Map({
   const pinRef = useRef(null);
   const [sp] = useSearchParams();
   const pos: [number, number] = [41.7143017651, 44.7494451407];
-  const zoom = 13;
+  const zoom = 14;
 
   useEffect(() => {
     if (!window) return;
@@ -57,7 +57,7 @@ export default function Map({
         }
         select(building);
       }
-    }, 100);
+    }, 500);
   }, [sp, mref, select]);
 
   useEffect(() => {

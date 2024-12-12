@@ -1,10 +1,7 @@
 import {
   FaBuilding,
-  FaChevronDown,
-  FaChevronUp,
   FaImage,
   FaRoute,
-  FaX,
 } from "react-icons/fa6";
 import { rooms } from "../data/rooms";
 import { Building } from "../data/buildings";
@@ -14,7 +11,6 @@ import L from "leaflet";
 
 export default function Info({
   selected,
-  select,
   mref,
   pin,
   pinned,
@@ -29,7 +25,6 @@ export default function Info({
     React.SetStateAction<L.Routing.Control | null>
   >;
 }) {
-  const [open, setOpen] = useState<boolean>(true);
   const [panel, setPanel] = useState<"gallery" | "search" | "route">("search");
   if (!selected) return null;
 
@@ -37,74 +32,57 @@ export default function Info({
     <div className="z-50 absolute md:bottom-10 bottom-0 w-screen">
       <div className="flex justify-center">
         <div
-          className={`bg-black ${
-            open ? "md:h-64 h-64" : ""
-          } md:w-[32rem] sm:w-96 w-screen  rounded-xl py-2 px-3 transition-all duration-150`}
+          className={`bg-black md:h-64 h-64 md:w-[32rem] sm:w-96 w-screen  rounded-xl py-2 px-3 transition-all duration-150`}
         >
-          <div className="flex justify-between gap-x-2">
-            <div
-              className="hover:bg-white/20 w-full cursor-pointer flex justify-center py-2"
-              onClick={() => setOpen((p) => !p)}
-            >
-              {open ? <FaChevronDown size={16} /> : <FaChevronUp size={16} />}
-            </div>
-            <FaX
-              size={16}
-              className="cursor-pointer my-2"
-              onClick={() => select(null)}
-            />
-          </div>
-          {open && (
-            <div>
-              <div className="text-center my-1 text-lg">{selected.name}</div>
-              <div className="flex justify-between border-y border-white py-2">
-                <div
-                  className="flex justify-center w-full hover:bg-white/20 py-1 cursor-pointer rounded-md"
-                  onClick={() => setPanel("search")}
-                >
-                  <FaSearch
-                    size={20}
-                    className="cursor-pointer hover:text-white/80"
-                  />
-                </div>
-                <div
-                  className="flex justify-center w-full hover:bg-white/20 py-1 cursor-pointer rounded-md bg-red-400/20"
-                  onClick={() => {
-                    // beta:   setPanel("gallery")
-                  }}
-                >
-                  <FaImage
-                    size={20}
-                    className="cursor-pointer hover:text-white/80"
-                  />
-                </div>
-                <div
-                  className="flex justify-center w-full hover:bg-white/20 py-1 cursor-pointer rounded-md bg-red-400/20"
-                  onClick={() => {
-                    // beta:   setPanel("route")
-                  }}
-                >
-                  <FaRoute
-                    size={20}
-                    className="cursor-pointer hover:text-white/80"
-                  />
-                </div>
-              </div>
-              {panel === "search" ? (
-                <SearchPanel building={selected} />
-              ) : panel === "gallery" ? (
-                <GalleryPanel building={selected} />
-              ) : (
-                <RoutePanel
-                  mref={mref}
-                  building={selected}
-                  pin={pin}
-                  pinned={pinned}
-                  setRouteControl={setRouteControl}
+          <div>
+            <div className="text-center my-1 text-lg">{selected.name}</div>
+            <div className="flex justify-between border-y border-white py-2">
+              <div
+                className="flex justify-center w-full hover:bg-white/20 py-1 cursor-pointer rounded-md"
+                onClick={() => setPanel("search")}
+              >
+                <FaSearch
+                  size={20}
+                  className="cursor-pointer hover:text-white/80"
                 />
-              )}
+              </div>
+              <div
+                className="flex justify-center w-full hover:bg-white/20 py-1 cursor-pointer rounded-md bg-red-400/20"
+                onClick={() => {
+                  // beta:   setPanel("gallery")
+                }}
+              >
+                <FaImage
+                  size={20}
+                  className="cursor-pointer hover:text-white/80"
+                />
+              </div>
+              <div
+                className="flex justify-center w-full hover:bg-white/20 py-1 cursor-pointer rounded-md bg-red-400/20"
+                onClick={() => {
+                  // beta:   setPanel("route")
+                }}
+              >
+                <FaRoute
+                  size={20}
+                  className="cursor-pointer hover:text-white/80"
+                />
+              </div>
             </div>
-          )}
+            {panel === "search" ? (
+              <SearchPanel building={selected} />
+            ) : panel === "gallery" ? (
+              <GalleryPanel building={selected} />
+            ) : (
+              <RoutePanel
+                mref={mref}
+                building={selected}
+                pin={pin}
+                pinned={pinned}
+                setRouteControl={setRouteControl}
+              />
+            )}
+          </div>
         </div>
       </div>
     </div>
@@ -114,7 +92,7 @@ export default function Info({
 const SearchPanel = ({ building }: { building: Building }) => {
   const [input, setInput] = useState<string>("");
   return (
-    <div>
+    <div className="md:max-h-40 relative overflow-hidden">
       <div className="flex justify-between mt-2">
         <input
           type="text"
@@ -122,9 +100,9 @@ const SearchPanel = ({ building }: { building: Building }) => {
           onChange={(e) => setInput(e.target.value)}
           className="bg-black text-white focus:outline-none px-2 py-1 border-b border-white"
         />
-        <a href={`/plan/${building.id}`}>შენობის გეგმა</a>
+        <a href={`/plan/${building.id}`} className="underline">შენობის გეგმა</a>
       </div>
-      <div className="h-32 overflow-y-auto">
+      <div className="h-32 overflow-y-auto relative">
         {rooms
           .filter((room) => {
             const searchInput = input.trim().toLowerCase();

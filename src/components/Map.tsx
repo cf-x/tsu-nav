@@ -5,24 +5,14 @@ import { Building, buildings } from "../data/buildings";
 import L, { Marker as LMarker } from "leaflet";
 import "leaflet-routing-machine";
 import { useSearchParams } from "react-router-dom";
+import { useAtom } from "jotai";
+import { pinAtom, routeControlAtom, selectAtom } from "../pages/map";
 
 export default function Map({
   mref,
-  select,
-  pinned,
-  selected,
-  routeControl,
-  setRouteControl,
   user,
 }: {
   mref: MutableRefObject<null>;
-  selected: Building | null;
-  select: React.Dispatch<React.SetStateAction<Building | null>>;
-  pinned: [number, number] | undefined;
-  routeControl: L.Routing.Control | null;
-  setRouteControl: React.Dispatch<
-    React.SetStateAction<L.Routing.Control | null>
-  >;
   user:
     | {
         x: number;
@@ -30,10 +20,13 @@ export default function Map({
       }
     | undefined;
 }) {
+  const [selected, select] = useAtom<Building | null>(selectAtom);
   const markerRefs = useRef<(LMarker | null)[]>([]);
   const pinRef = useRef(null);
   const [sp] = useSearchParams();
   const pos: [number, number] = [41.7143017651, 44.7494451407];
+  const [pinned] = useAtom(pinAtom);
+  const [routeControl, setRouteControl] = useAtom(routeControlAtom);
   const zoom = 14;
 
   useEffect(() => {
@@ -66,6 +59,7 @@ export default function Map({
   useEffect(() => {
     if (!pinned) {
       if (routeControl) {
+        // @ts-expect-error comment
         routeControl.remove();
       }
       return;
@@ -83,6 +77,7 @@ export default function Map({
           : null;
 
       if (routeControl && pinPosition && selectedPosition) {
+        // @ts-expect-error comment
         routeControl.setWaypoints([pinPosition, selectedPosition]);
       } else {
         const newRouteControl = L.Routing.control({
@@ -91,6 +86,7 @@ export default function Map({
           addWaypoints: false,
           show: false,
         }).addTo(mref.current!);
+        // @ts-expect-error comment
         setRouteControl(newRouteControl);
       }
     }

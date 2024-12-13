@@ -1,26 +1,23 @@
-import { FaBuilding, FaImage, FaRoute } from "react-icons/fa6";
+import {
+  FaBuilding,
+  FaChevronLeft,
+  FaChevronRight,
+  FaImage,
+  FaRoute,
+} from "react-icons/fa6";
 import { rooms } from "../data/rooms";
-import { Building } from "../data/buildings";
+import { Building, buildings } from "../data/buildings";
 import { MutableRefObject, useState } from "react";
 import { FaSearch } from "react-icons/fa";
-import L from "leaflet";
+import { useAtom } from "jotai";
+import { pinAtom, routeControlAtom, selectAtom } from "../pages/map";
+import { useSearchParams } from "react-router-dom";
 
 export default function Info({
-  selected,
   mref,
-  pin,
-  pinned,
-  setRouteControl,
   user,
 }: {
-  selected: Building | null;
-  select: React.Dispatch<React.SetStateAction<Building | null>>;
   mref: MutableRefObject<null>;
-  pin: React.Dispatch<React.SetStateAction<[number, number] | undefined>>;
-  pinned: [number, number] | undefined;
-  setRouteControl: React.Dispatch<
-    React.SetStateAction<L.Routing.Control | null>
-  >;
   user:
     | {
         x: number;
@@ -29,7 +26,43 @@ export default function Info({
     | undefined;
 }) {
   const [panel, setPanel] = useState<"gallery" | "search" | "route">("search");
+  const [selected, setSelected] = useAtom(selectAtom);
+  const [,setParams] = useSearchParams(); // useSearchParams hook for URL params
+  // const navigate = useNavigate(); // For changing the URL
+
   if (!selected) return null;
+
+  const getAdjacentBuildings = () => {
+    const currentIndex = buildings.findIndex((b) => b.id === selected.id);
+    const prev = buildings[currentIndex - 1] || null;
+    const next = buildings[(currentIndex + 1) % buildings.length] || null;
+    return { prev, next };
+  };
+
+  const handleBuildingMove = (direction: "prev" | "next") => {
+    const { prev, next } = getAdjacentBuildings();
+
+    if (direction === "prev" && prev) {
+      setParams((prevParams) => {
+        const newParams = new URLSearchParams(prevParams);
+        newParams.set("focus", prev.id.toString());
+        return newParams;
+      });
+      setSelected(prev);
+      // @ts-expect-error false
+      mref.current?.flyTo(prev.coordinates);
+    } else if (direction === "next" && next) {
+      // Update the URL params and state
+      setParams((prevParams) => {
+        const newParams = new URLSearchParams(prevParams);
+        newParams.set("focus", next.id.toString());
+        return newParams;
+      });
+      setSelected(next);
+      // @ts-expect-error false
+      mref.current?.flyTo(next.coordinates);
+    }
+  };
 
   return (
     <div className="z-50 absolute md:bottom-10 bottom-0 w-screen">
@@ -38,7 +71,33 @@ export default function Info({
           className={`bg-black md:h-64 h-64 md:w-[32rem] sm:w-96 w-screen  rounded-xl py-2 px-3 transition-all duration-150`}
         >
           <div>
-            <div className="text-center my-1 text-lg">{selected.name}</div>
+            <div className="flex justify-between my-1 text-lg">
+              <div
+                onClick={() => {
+                  // @ts-expect-error false
+                  mref.current!.flyTo(selected.coordinates);
+                }}
+                className="cursor-pointer hover:text-blue-400 transition-all duration-100"
+              >
+                {selected.name}
+              </div>
+              <div className="flex gap-x-2 items-center">
+                {getAdjacentBuildings().prev && (
+                  <FaChevronLeft
+                    onClick={() => handleBuildingMove("prev")}
+                    size={28}
+                    className="hover:bg-white/20 p-1 rounded-md cursor-pointer"
+                  />
+                )}
+                {getAdjacentBuildings().next && (
+                  <FaChevronRight
+                    onClick={() => handleBuildingMove("next")}
+                    size={28}
+                    className="hover:bg-white/20 p-1 rounded-md cursor-pointer"
+                  />
+                )}
+              </div>
+            </div>
             <div className="flex justify-between border-y border-white py-2">
               <div
                 className="flex justify-center w-full hover:bg-white/20 py-1 cursor-pointer rounded-md"
@@ -77,14 +136,7 @@ export default function Info({
             ) : panel === "gallery" ? (
               <GalleryPanel building={selected} />
             ) : (
-              <RoutePanel
-                mref={mref}
-                building={selected}
-                pin={pin}
-                pinned={pinned}
-                user={user}
-                setRouteControl={setRouteControl}
-              />
+              <RoutePanel mref={mref} building={selected} user={user} />
             )}
           </div>
         </div>
@@ -148,18 +200,10 @@ const GalleryPanel = ({ building }: { building: Building }) => {
 const RoutePanel = ({
   building,
   mref,
-  pin,
-  pinned,
-  setRouteControl,
   user,
 }: {
   building: Building;
   mref: MutableRefObject<null>;
-  pin: React.Dispatch<React.SetStateAction<[number, number] | undefined>>;
-  pinned: [number, number] | undefined;
-  setRouteControl: React.Dispatch<
-    React.SetStateAction<L.Routing.Control | null>
-  >;
   user:
     | {
         x: number;
@@ -167,6 +211,9 @@ const RoutePanel = ({
       }
     | undefined;
 }) => {
+  const [pinned, pin] = useAtom(pinAtom);
+  const [, setRouteControl] = useAtom(routeControlAtom);
+
   return (
     <div className="p-2">
       <div className="flex flex-col gap-y-2">
@@ -180,6 +227,7 @@ const RoutePanel = ({
               className="cursor-pointer underline"
               onClick={() => {
                 pin(undefined);
+                // @ts-expect-error comment
                 setRouteControl(null);
               }}
             >

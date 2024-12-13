@@ -23,5 +23,6 @@ createRoot(document.getElementById("root")!).render(
         <Route path="*" element={<Navigate to="/?code=404" replace />} />
       </Routes>
     </Router>
+    <div className="w-full text-center py-12">by <span className="text-blue-400 cursor-pointer">Innovative technologies club</span></div>
   </StrictMode>
 );

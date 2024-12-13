@@ -3,6 +3,7 @@ import { RiEqualizer2Line } from "react-icons/ri";
 import { buildings } from "../data/buildings";
 import { FaUniversity } from "react-icons/fa";
 import Search from "../components/Search";
+import { FaInfo } from "react-icons/fa6";
 
 export default function Home() {
   const [isExpanded, expand] = useState<boolean>(false);
@@ -56,6 +57,14 @@ export default function Home() {
             <a href="/#fs">სწრაფი ძებნა</a>
             <a href="/map">რუკა</a>
           </div>
+        </div>
+        <div
+          className="flex justify-start text-sm text-gray-300 items-center w-44 sm:w-64 md:w-96 border rounded-md border-blue-400 p-3
+        "
+        >
+          <FaInfo size={20} className="text-blue-400 ml-2 mr-4" /> საიტი beta
+          ვერსიაში მუშაობს. ამ ეტაპზე
+          ხელმისწავდომია მხოლოდ პირველი კორპუსის ოთახები.
         </div>
       </div>
       <section id="fs" className="flex flex-col items-center mt-96 mb-32">

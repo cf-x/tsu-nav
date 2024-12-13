@@ -21,7 +21,7 @@ const Building = () => {
       if (params.get("room")) {
         setRoom(Number(params.get("room")));
       }
-    }, 100);
+    }, 500);
   }, [data, params]);
 
   if (!data) {

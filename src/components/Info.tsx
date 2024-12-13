@@ -1,8 +1,4 @@
-import {
-  FaBuilding,
-  FaImage,
-  FaRoute,
-} from "react-icons/fa6";
+import { FaBuilding, FaImage, FaRoute } from "react-icons/fa6";
 import { rooms } from "../data/rooms";
 import { Building } from "../data/buildings";
 import { MutableRefObject, useState } from "react";
@@ -15,6 +11,7 @@ export default function Info({
   pin,
   pinned,
   setRouteControl,
+  user,
 }: {
   selected: Building | null;
   select: React.Dispatch<React.SetStateAction<Building | null>>;
@@ -24,6 +21,12 @@ export default function Info({
   setRouteControl: React.Dispatch<
     React.SetStateAction<L.Routing.Control | null>
   >;
+  user:
+    | {
+        x: number;
+        y: number;
+      }
+    | undefined;
 }) {
   const [panel, setPanel] = useState<"gallery" | "search" | "route">("search");
   if (!selected) return null;
@@ -60,7 +63,7 @@ export default function Info({
               <div
                 className="flex justify-center w-full hover:bg-white/20 py-1 cursor-pointer rounded-md bg-red-400/20"
                 onClick={() => {
-                  // beta:   setPanel("route")
+                  // setPanel("route");
                 }}
               >
                 <FaRoute
@@ -79,6 +82,7 @@ export default function Info({
                 building={selected}
                 pin={pin}
                 pinned={pinned}
+                user={user}
                 setRouteControl={setRouteControl}
               />
             )}
@@ -100,7 +104,9 @@ const SearchPanel = ({ building }: { building: Building }) => {
           onChange={(e) => setInput(e.target.value)}
           className="bg-black text-white focus:outline-none px-2 py-1 border-b border-white"
         />
-        <a href={`/plan/${building.id}`} className="underline">შენობის გეგმა</a>
+        <a href={`/plan/${building.id}`} className="underline">
+          შენობის გეგმა
+        </a>
       </div>
       <div className="h-32 overflow-y-auto relative">
         {rooms
@@ -145,6 +151,7 @@ const RoutePanel = ({
   pin,
   pinned,
   setRouteControl,
+  user,
 }: {
   building: Building;
   mref: MutableRefObject<null>;
@@ -153,6 +160,12 @@ const RoutePanel = ({
   setRouteControl: React.Dispatch<
     React.SetStateAction<L.Routing.Control | null>
   >;
+  user:
+    | {
+        x: number;
+        y: number;
+      }
+    | undefined;
 }) => {
   return (
     <div className="p-2">
@@ -184,8 +197,19 @@ const RoutePanel = ({
         >
           {pinned ? "Reset" : "Choose on the Map"}
         </div>
-        <div className="p-1 border cursor-pointer rounded-md select-none">
-          Choose the building
+        <div
+          onClick={() => {
+            if (user) {
+              pin([user.x, user.y]);
+              // @ts-expect-error false
+              mref.current!.flyTo([user.x, user.y], 15);
+            }
+          }}
+          className={`p-1 border cursor-pointer rounded-md select-none ${
+            !user && "text-red-500"
+          }`}
+        >
+          My Location
         </div>
       </div>
     </div>

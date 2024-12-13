@@ -10,20 +10,25 @@ export default function Map({
   mref,
   select,
   pinned,
-  pin,
   selected,
   routeControl,
   setRouteControl,
+  user,
 }: {
   mref: MutableRefObject<null>;
   selected: Building | null;
   select: React.Dispatch<React.SetStateAction<Building | null>>;
   pinned: [number, number] | undefined;
-  pin: React.Dispatch<React.SetStateAction<[number, number] | undefined>>;
   routeControl: L.Routing.Control | null;
   setRouteControl: React.Dispatch<
     React.SetStateAction<L.Routing.Control | null>
   >;
+  user:
+    | {
+        x: number;
+        y: number;
+      }
+    | undefined;
 }) {
   const markerRefs = useRef<(LMarker | null)[]>([]);
   const pinRef = useRef(null);
@@ -44,21 +49,19 @@ export default function Map({
     L.Marker.prototype.options.icon = defIcon;
   }, []);
 
-  useEffect(() => {
-    setTimeout(() => {
-      if (sp.get("focus")) {
-        const building = buildings.filter(
-          (b) => b.id === Number(sp.get("focus"))
-        )[0];
+  setTimeout(() => {
+    if (sp.get("focus")) {
+      const building = buildings.filter(
+        (b) => b.id === Number(sp.get("focus"))
+      )[0];
 
-        if (mref.current) {
-          // @ts-expect-error false
-          mref.current.flyTo(building.coordinates, 18);
-        }
-        select(building);
+      if (mref.current) {
+        // @ts-expect-error false
+        mref.current.flyTo(building.coordinates, 18);
       }
-    }, 500);
-  }, [sp, mref, select]);
+      select(building);
+    }
+  }, 500);
 
   useEffect(() => {
     if (!pinned) {
@@ -86,6 +89,7 @@ export default function Map({
           waypoints: [pinPosition, selectedPosition],
           routeWhileDragging: false,
           addWaypoints: false,
+          show: false,
         }).addTo(mref.current!);
         setRouteControl(newRouteControl);
       }
@@ -111,29 +115,15 @@ export default function Map({
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
       />
-      {pinned && (
-        <>
-          <Marker
-            position={pinned}
-            icon={L.icon({
-              iconUrl: "/pin.svg",
-              iconSize: [36, 36],
-              iconAnchor: [12, 41],
-              popupAnchor: [1, -36],
-              shadowSize: [41, 41],
-            })}
-            alt="location"
-            key="location"
-            ref={pinRef}
-            draggable
-            eventHandlers={{
-              dragend: (e: L.LeafletEvent) => {
-                const newLatLng = e.target.getLatLng();
-                pin([newLatLng.lat, newLatLng.lng]);
-              },
-            }}
-          />
-        </>
+      {user && (
+        <Marker
+          position={[user.x, user.y]}
+          icon={L.divIcon({
+            className: "leaflet-div-icon",
+            html: `<div style="background-color: red; width: 10px; height: 10px; border-radius: 50%;"></div>`,
+          })}
+          key="user-location"
+        />
       )}
       {buildings.map((building, index) => (
         <Marker

@@ -55,12 +55,11 @@ export default function Search({
       <input
         ref={searchBarRef}
         type="search"
-        className="bg-black border-b border-b-blue-400 min-w-64 md:min-w-96 focus:outline-none px-2 h-8"
+        className="bg-black border-b border-b-blue-400 min-w-44 sm:min-w-64 md:min-w-96 focus:outline-none px-2 h-8"
         onChange={handleInputChange}
         placeholder="ძებნა"
         value={input}
       />
-
       {input.length > 0 && (
         <div
           className="mt-5 p-3 flex flex-col absolute w-64 md:w-96 border border-blue-400 rounded-md z-50 bg-black"
@@ -106,7 +105,12 @@ export default function Search({
           )}
 
           {filteredBuildings.length === 0 && filteredRooms.length === 0 && (
-            <div className="text-white">ვერაფერი მოიძებნა, ცადეთ <a href="/#fs" className="underline text-blue-400">სწრაფი ძებნა</a></div>
+            <div className="text-white">
+              ვერაფერი მოიძებნა, ცადეთ{" "}
+              <a href="/#fs" className="underline text-blue-400">
+                სწრაფი ძებნა
+              </a>
+            </div>
           )}
         </div>
       )}

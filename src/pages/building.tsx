@@ -3,6 +3,7 @@ import { buildings } from "../data/buildings";
 import { useEffect, useRef, useState } from "react";
 import { rooms } from "../data/rooms";
 import { nodes } from "../utils/path";
+import { floors } from "../data/floors";
 
 const Building = () => {
   const [floor, setFloor] = useState<number>(0);
@@ -33,9 +34,13 @@ const Building = () => {
     (_, i) => data.floors![0] + i
   );
 
-  const startingPoint = { x: 500, y: 625 };
+  const currentFloors = floors.filter(
+    (f) => f.building === data.id && f.floor === floor
+  );
+  const startingPoint =
+    currentFloors.length > 0 ? currentFloors[0].startingPoint : { x: 0, y: 0 };
 
-  const convertToImageCoordinates = (roomCoords: { x: number; y: number }) => {
+  const ImageToDevice = (roomCoords: { x: number; y: number }) => {
     if (imageRef.current) {
       const { width, height } = imageRef.current;
       return {
@@ -45,13 +50,28 @@ const Building = () => {
     }
     return { x: 0, y: 0 };
   };
+  const DeviceToImage = ({ x, y }: { x: number; y: number }) => {
+    if (imageRef.current) {
+      const { width, height } = imageRef.current;
+
+      const rect = imageRef.current.getBoundingClientRect();
+      const adjustedX = x - rect.left;
+      const adjustedY = y - rect.top;
+
+      return {
+        x: Math.round((adjustedX / width) * 1000),
+        y: Math.round((adjustedY / height) * 1000),
+      };
+    }
+    return { x, y };
+  };
 
   const drawNodes = (room: number) => {
-    const start = convertToImageCoordinates(startingPoint);
+    const start = ImageToDevice(startingPoint);
     let pathString = `M${start.x},${start.y}`;
 
     nodes(Number(id), floor, room).forEach((coos) => {
-      const { x, y } = convertToImageCoordinates({
+      const { x, y } = ImageToDevice({
         x: coos[0],
         y: coos[1],
       });
@@ -61,7 +81,7 @@ const Building = () => {
     const room_coos = rooms.filter(
       (r) => r.building === Number(id) && r.id === room
     )[0].coordinates;
-    const { x, y } = convertToImageCoordinates({
+    const { x, y } = ImageToDevice({
       x: room_coos[0],
       y: room_coos[1],
     });
@@ -79,41 +99,41 @@ const Building = () => {
 
   return (
     <>
+      <div className="bottom-10 flex justify-center w-full fixed z-40 gap-x-4 md:gap-x-12">
+        <select
+          name="floor"
+          id={`select-floor-${id}`}
+          defaultValue={Number(params.get("floor")) || data.floors![0]}
+          className="bg-black cursor-pointer p-2 rounded-lg border md:border-none"
+          onChange={(e) => {
+            setFloor(Number(e.target.value));
+            setRoom(null);
+          }}
+        >
+          {floorOptions.map((floorNumber) => (
+            <option key={floorNumber} value={floorNumber}>
+              სართული {floorNumber}
+            </option>
+          ))}
+        </select>
+        <select
+          name="room"
+          id={`select-room-${id}`}
+          value={room || 0}
+          className="bg-black cursor-pointer p-2 rounded-lg border md:border-none"
+          onChange={handleRoomChange}
+        >
+          {floorRooms.map((r) => (
+            <option key={r.id + r.name} value={r.id}>
+              {r.name}
+            </option>
+          ))}
+        </select>
+      </div>
       <nav className="flex p-3 md:py-4 justify-between">
         <a href="/" className="z-50 -my-2">
           <img src="/tsu.svg" alt="tsu logo" className="w-12" />
         </a>
-        <div className="flex justify-center w-full fixed z-40 gap-x-4 md:gap-x-12">
-          <select
-            name="floor"
-            id={`select-floor-${id}`}
-            defaultValue={Number(params.get("floor")) || data.floors![0]}
-            className="bg-black cursor-pointer p-2 rounded-lg"
-            onChange={(e) => {
-              setFloor(Number(e.target.value));
-              setRoom(null);
-            }}
-          >
-            {floorOptions.map((floorNumber) => (
-              <option key={floorNumber} value={floorNumber}>
-                სართული {floorNumber}
-              </option>
-            ))}
-          </select>
-          <select
-            name="room"
-            id={`select-room-${id}`}
-            value={room || 0}
-            className="bg-black cursor-pointer p-2 rounded-lg"
-            onChange={handleRoomChange}
-          >
-            {floorRooms.map((r) => (
-              <option key={r.id + r.name} value={r.id}>
-                {r.name}
-              </option>
-            ))}
-          </select>
-        </div>
         <div>{data.name}</div>
       </nav>
 
@@ -122,6 +142,10 @@ const Building = () => {
           ref={imageRef}
           src={`/building-${id}-floor-${floor}.png`}
           alt={`building ${id} floor ${floor} plan`}
+          onClick={(e) => {
+            console.log(DeviceToImage({ x: e.clientX, y: e.clientY }));
+          }}
+          className="w-screen"
         />
         {room && (
           <svg className="absolute top-0 left-0 w-full h-full pointer-events-none animate-pulse">

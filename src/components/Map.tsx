@@ -1,25 +1,20 @@
 import "leaflet/dist/leaflet.css";
-import { MutableRefObject, useEffect, useRef } from "react";
+import { useEffect, useRef } from "react";
 import { MapContainer, Marker, Popup, TileLayer, Tooltip } from "react-leaflet";
 import { Building, buildings } from "../data/buildings";
 import L, { Marker as LMarker } from "leaflet";
 import "leaflet-routing-machine";
 import { useSearchParams } from "react-router-dom";
 import { useAtom } from "jotai";
-import { pinAtom, routeControlAtom, selectAtom } from "../pages/map";
+import {
+  mapRefAtom,
+  pinAtom,
+  routeControlAtom,
+  selectAtom,
+  userLocationAtom,
+} from "../utils/atoms";
 
-export default function Map({
-  mref,
-  user,
-}: {
-  mref: MutableRefObject<null>;
-  user:
-    | {
-        x: number;
-        y: number;
-      }
-    | undefined;
-}) {
+export default function Map() {
   const [selected, select] = useAtom<Building | null>(selectAtom);
   const markerRefs = useRef<(LMarker | null)[]>([]);
   const pinRef = useRef(null);
@@ -27,7 +22,8 @@ export default function Map({
   const pos: [number, number] = [41.7143017651, 44.7494451407];
   const [pinned] = useAtom(pinAtom);
   const [routeControl, setRouteControl] = useAtom(routeControlAtom);
-  const zoom = 14;
+  const [mref] = useAtom(mapRefAtom);
+  const [user] = useAtom(userLocationAtom);
 
   useEffect(() => {
     if (!window) return;
@@ -48,8 +44,7 @@ export default function Map({
         (b) => b.id === Number(sp.get("focus"))
       )[0];
 
-      if (mref.current) {
-        // @ts-expect-error false
+      if (mref?.current) {
         mref.current.flyTo(building.coordinates, 18);
       }
       select(building);
@@ -85,7 +80,7 @@ export default function Map({
           routeWhileDragging: false,
           addWaypoints: false,
           show: false,
-        }).addTo(mref.current!);
+        }).addTo(mref!.current!);
         // @ts-expect-error comment
         setRouteControl(newRouteControl);
       }
@@ -93,19 +88,23 @@ export default function Map({
   }, [pinned, selected, mref, routeControl, setRouteControl]);
 
   const handleMarkerClick = (building: Building) => {
-    if (mref.current) {
-      // @ts-expect-error false
-      mref.current.flyTo(building.coordinates, 18);
-      select(building);
-    }
+    sp.set("focus", building.id.toString());
+    select(building);
+    if (mref?.current) mref.current.flyTo(building.coordinates, 18);
   };
 
   return (
     <MapContainer
       center={pos}
-      zoom={zoom}
+      zoom={14}
       className="w-full z-10 h-[90vh]"
+      /*@ts-expect-error false */
       ref={mref}
+      maxBounds={[
+        [41.605, 44.63],
+        [41.85, 45.0],
+      ]}
+      maxBoundsViscosity={1.0}
     >
       <TileLayer
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"

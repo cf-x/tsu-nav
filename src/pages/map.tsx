@@ -1,21 +1,21 @@
-/* eslint-disable react-refresh/only-export-components */
 import Search from "../components/Search.tsx";
 import Map from "../components/Map.tsx";
-import { useRef, useState } from "react";
-import { Building } from "../data/buildings.tsx";
-import Info from "../components/Info.tsx";
+import { useEffect, useRef, useState } from "react";
 import L from "leaflet";
 import { FaLocationPin, FaLocationPinLock } from "react-icons/fa6";
-import { atom } from "jotai";
-
-export const selectAtom = atom<Building | null>(null);
-export const pinAtom = atom<[number, number]>();
-export const routeControlAtom = atom<[L.Routing.Control]>();
+import { useAtom } from "jotai";
+import Panel from "../components/Panel/index.tsx";
+import { mapRefAtom, userLocationAtom } from "../utils/atoms.ts";
 
 function App() {
-  const mapRef = useRef(null);
+  const mapRef = useRef<L.Map | null>(null);
+  const [, setMapRef] = useAtom(mapRefAtom);
   const [isLocation, setLocation] = useState<boolean>(false);
-  const [useLocation, setUserLocation] = useState<{ x: number; y: number }>();
+  const [, setUserLocation] = useAtom(userLocationAtom);
+
+  useEffect(() => {
+    setMapRef(mapRef);
+  }, [mapRef, setMapRef]);
 
   const navigate = () => {
     if (navigator.geolocation) {
@@ -62,14 +62,8 @@ function App() {
           )}
         </div>
       </nav>
-      <Map
-        mref={mapRef}
-        user={useLocation}
-      />
-      <Info
-        mref={mapRef}
-        user={useLocation}
-      />
+      <Map />
+      <Panel />
     </>
   );
 }

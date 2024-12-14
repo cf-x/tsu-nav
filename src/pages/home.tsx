@@ -59,12 +59,12 @@ export default function Home() {
           </div>
         </div>
         <div
-          className="flex justify-start text-sm text-gray-300 items-center w-44 sm:w-64 md:w-96 border rounded-md border-blue-400 p-3
+          className="flex justify-start text-sm text-gray-300 items-center w-64 md:w-96 border rounded-md border-blue-400 p-3
         "
         >
           <FaInfo size={20} className="text-blue-400 ml-2 mr-4" /> საიტი beta
-          ვერსიაში მუშაობს. ამ ეტაპზე
-          ხელმისწავდომია მხოლოდ პირველი კორპუსის ოთახები.
+          ვერსიაში მუშაობს. ამ ეტაპზე ხელმისწავდომია მხოლოდ პირველი კორპუსის
+          ოთახები.
         </div>
       </div>
       <section id="fs" className="flex flex-col items-center mt-96 mb-32">
@@ -85,6 +85,12 @@ export default function Home() {
           })}
         </div>
       </section>
+      <div className="w-full text-center py-12">
+        by{" "}
+        <span className="text-blue-400 cursor-pointer">
+          Innovative technologies club
+        </span>
+      </div>
     </div>
   );
 }
